@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <declare-styleable name="SingleView">
+        <attr name="status">
+            <enum name="state_0" value= "0"/>
+            <enum name="state_1" value= "1"/>
+            <enum name="state_null" value= "2"/>
+        </attr>
+        <!--<attr name="isPre" format="boolean"/>-->
+        <!--<attr name="isDevelop" format="boolean"/>-->
+    </declare-styleable>
+
+</resources>
