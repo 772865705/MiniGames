@@ -42,6 +42,14 @@ class SwipeGridLayout @JvmOverloads constructor(
 
     fun onChildClicked(v: SingleView, x: Int, y: Int) {
         showToast("x:$x,y:$y")
+        if (!started){
+            initCurGame(x,y)
+            started = true
+        }
+    }
+
+    fun initCurGame(firstX:Int,firstY: Int){
+
     }
 
     fun onChildLongClicked(v: SingleView, x: Int, y: Int) {
