@@ -20,10 +20,12 @@ class SwipeGridLayout @JvmOverloads constructor(
 ) : GridLayout(context, attrs, defStyleAttr) {
 
 
-    init {
-    }
+    var goods:Int//标记剩余未点开的非雷格子，用于判断游戏胜利
 
-    var started = false
+    init {
+        goods = xLength*yLength-mineNum
+    }
+    var started = false//按下第一个点之后变为true
 
     fun fillAll() {
         removeAllViews()
@@ -39,12 +41,13 @@ class SwipeGridLayout @JvmOverloads constructor(
     }
 
     fun onChildClicked(v: SingleView, x: Int, y: Int) {
-//        showToast("xLength:$xLength,yLength:$yLength")
+//        showToast("x:$x,y:$y")
         if (!started) {
             initCurGame(x, y)
             started = true
+            listener?.onStart(mineNum)
         }
-        //TODO 初始化完游戏之后 每一次（包括第一次）按下之后的逻辑
+        // 初始化完游戏之后 每一次（包括第一次）按下之后的逻辑
         when (v.logicState) {
             SingleView.LOGICSTATE_BOMB -> {
                 doEachSingle { singleView ->
@@ -55,9 +58,11 @@ class SwipeGridLayout @JvmOverloads constructor(
                     singleView.enable = false
                 }
                 v.viewState = SingleView.VIEWSTATE_BOMB
+                listener?.defeat()
             }
             in 1..8 -> {
                 v.viewState = SingleView.VIEWSTATE_TIP
+                goods--
             }
             0 -> {
                 openAround(v, LogicHelper.getIndexByXY(xLength, yLength, x, y))
@@ -66,11 +71,16 @@ class SwipeGridLayout @JvmOverloads constructor(
 
         v.enable = false//点过一次之后不能再点击
         doEachSingle { singleView -> singleView.updateInsideImg() }
+        if (goods<=0){
+            listener?.victory()
+            doEachSingle { singleView -> singleView.enable = false }
+        }
     }
 
     fun openAround(v: SingleView, index: Int) {
         v.enable = false
         v.viewState = SingleView.VIEWSTATE_TIP
+        goods--
         for (around in LogicHelper.getAroundItems(xLength, yLength, index)) {
             val item = getChildByIndex(around)
             if (item.viewState == SingleView.VIEWSTATE_DEFAULT && item.logicState >= 0){
@@ -80,12 +90,14 @@ class SwipeGridLayout @JvmOverloads constructor(
                 }else{
                     item.enable = false
                     item.viewState = SingleView.VIEWSTATE_TIP
+                    goods--
                 }
             }
         }
     }
 
     fun initCurGame(firstX: Int, firstY: Int) {
+        goods = xLength * yLength - mineNum
         //初始化所有格子
         initAllChildBefore()
         //随机初始化雷 避免点下的第一个
@@ -105,7 +117,8 @@ class SwipeGridLayout @JvmOverloads constructor(
                 logi("mine:$i,around:$j")
                 val view = getChildByIndex(j)
                 view.around++
-                view.logicState = view.around
+                if (view.logicState >= 0)//如果不是雷的话
+                    view.logicState = view.around
                 view.updateInsideImg()
             }
         }
@@ -119,15 +132,21 @@ class SwipeGridLayout @JvmOverloads constructor(
 
     fun initAllChildBefore() {
         doEachSingle { singleView: SingleView ->
-            singleView.logicState = 0
+            singleView.logicState = 0//初始化逻辑状态 Default
             singleView.viewState = SingleView.VIEWSTATE_DEFAULT//
             singleView.around = 0
             singleView.updateInsideImg()
         }
     }
 
+    var flags = 0
     fun onChildLongClicked(v: SingleView, x: Int, y: Int, viewState: Int) {
 //        showToast("long_x:$x,yLength:$y")
+        when(viewState){
+            SingleView.VIEWSTATE_FLAG ->flags++
+            SingleView.VIEWSTATE_UNSURE -> flags--
+        }
+        listener?.onFlagsChange(flags,mineNum-flags)
     }
 
     fun getChildByXY(x: Int, y: Int): SingleView {
@@ -138,6 +157,28 @@ class SwipeGridLayout @JvmOverloads constructor(
         for (i in 0..childCount - 1) {
             m(getChildByIndex(i))
         }
+    }
+
+    /**
+     * 开始
+     */
+    fun reset(){
+        doEachSingle {singleView ->
+            flags = 0
+            goods = xLength * yLength - mineNum
+            started = false//要点击第一个之后才会变成true
+            singleView.reset()
+            singleView.updateInsideImg()
+        }
+    }
+
+
+    var listener:GameStateChange? = null
+    interface GameStateChange{
+        fun onStart(rest:Int)
+        fun onFlagsChange(flags:Int,rest:Int)
+        fun victory()
+        fun defeat()
     }
 
     /**
