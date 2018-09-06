@@ -39,16 +39,16 @@ class SwipeGridLayout @JvmOverloads constructor(
     }
 
     fun onChildClicked(v: SingleView, x: Int, y: Int) {
-        showToast("xLength:$xLength,yLength:$yLength")
-        if (!started){
-            initCurGame(x,y)
+//        showToast("xLength:$xLength,yLength:$yLength")
+        if (!started) {
+            initCurGame(x, y)
             started = true
         }
         //TODO 初始化完游戏之后 每一次（包括第一次）按下之后的逻辑
-        when(v.logicState){
+        when (v.logicState) {
             SingleView.LOGICSTATE_BOMB -> {
                 doEachSingle { singleView ->
-                    if (singleView.logicState == SingleView.LOGICSTATE_BOMB){
+                    if (singleView.logicState == SingleView.LOGICSTATE_BOMB) {
                         loge("x:${singleView.x},y:${singleView.y}:bomb")
                         singleView.viewState = SingleView.VIEWSTATE_THUNDER
                     }
@@ -56,21 +56,41 @@ class SwipeGridLayout @JvmOverloads constructor(
                 }
                 v.viewState = SingleView.VIEWSTATE_BOMB
             }
-            in 0..8 ->{
+            in 1..8 -> {
                 v.viewState = SingleView.VIEWSTATE_TIP
+            }
+            0 -> {
+                openAround(v, LogicHelper.getIndexByXY(xLength, yLength, x, y))
             }
         }
 
         v.enable = false//点过一次之后不能再点击
-        doEachSingle { singleView ->  singleView.updateInsideImg() }
+        doEachSingle { singleView -> singleView.updateInsideImg() }
     }
 
-    fun initCurGame(firstX:Int,firstY: Int){
+    fun openAround(v: SingleView, index: Int) {
+        v.enable = false
+        v.viewState = SingleView.VIEWSTATE_TIP
+        for (around in LogicHelper.getAroundItems(xLength, yLength, index)) {
+            val item = getChildByIndex(around)
+            if (item.viewState == SingleView.VIEWSTATE_DEFAULT && item.logicState >= 0){
+                if (item.around == 0){
+                    logi("x,y:${LogicHelper.getXYbyIndex(xLength,yLength,index).asList()}")
+                    openAround(getChildByIndex(around), around)
+                }else{
+                    item.enable = false
+                    item.viewState = SingleView.VIEWSTATE_TIP
+                }
+            }
+        }
+    }
+
+    fun initCurGame(firstX: Int, firstY: Int) {
         //初始化所有格子
         initAllChildBefore()
         //随机初始化雷 避免点下的第一个
         val randomMines = LogicHelper.randomMines(xLength, yLength, firstX, firstY, mineNum)
-        for (i:Int in randomMines){
+        for (i: Int in randomMines) {
             val singleView = getChildByIndex(i)
             singleView.logicState = SingleView.LOGICSTATE_BOMB
             singleView.viewState = SingleView.VIEWSTATE_DEFAULT//test 显示雷
@@ -80,11 +100,12 @@ class SwipeGridLayout @JvmOverloads constructor(
     }
 
     fun calMinesAround(randomMines: ArrayList<Int>) {
-        for (i:Int in randomMines){
-            for (j in LogicHelper.getAroundItems(xLength,yLength,i)){
+        for (i: Int in randomMines) {
+            for (j in LogicHelper.getAroundItems(xLength, yLength, i)) {
                 logi("mine:$i,around:$j")
                 val view = getChildByIndex(j)
                 view.around++
+                view.logicState = view.around
                 view.updateInsideImg()
             }
         }
@@ -92,30 +113,29 @@ class SwipeGridLayout @JvmOverloads constructor(
 
     }
 
-    fun getChildByIndex(index:Int):SingleView{
+    fun getChildByIndex(index: Int): SingleView {
         return getChildAt(index) as SingleView
     }
 
-    fun initAllChildBefore(){
-        doEachSingle {
-            singleView: SingleView ->
+    fun initAllChildBefore() {
+        doEachSingle { singleView: SingleView ->
             singleView.logicState = 0
-            singleView.viewState = SingleView.VIEWSTATE_DEFAULT//test 显示周围雷数量
+            singleView.viewState = SingleView.VIEWSTATE_DEFAULT//
             singleView.around = 0
             singleView.updateInsideImg()
         }
     }
 
-    fun onChildLongClicked(v: SingleView, x: Int, y: Int,viewState:Int) {
-        showToast("long_x:$x,yLength:$y")
+    fun onChildLongClicked(v: SingleView, x: Int, y: Int, viewState: Int) {
+//        showToast("long_x:$x,yLength:$y")
     }
 
     fun getChildByXY(x: Int, y: Int): SingleView {
         return getChildAt(y * columnCount + x) as SingleView
     }
 
-    fun doEachSingle(m:(singleView:SingleView)->Unit){
-        for (i in 0..childCount-1){
+    fun doEachSingle(m: (singleView: SingleView) -> Unit) {
+        for (i in 0..childCount - 1) {
             m(getChildByIndex(i))
         }
     }
@@ -144,11 +164,11 @@ class SwipeGridLayout @JvmOverloads constructor(
 //                canvas.drawLine(cellView.right.toFloat(), cellView.top.toFloat(),
 //                        cellView.right.toFloat(), cellView.bottom.toFloat(), localPaint)
 //            } else {
-            if (i < columnCount){
+            if (i < columnCount) {
                 canvas.drawLine(cellView.left.toFloat(), cellView.top.toFloat(),
                         cellView.right.toFloat(), cellView.top.toFloat(), localPaint)
             }
-            if (i % columnCount == 0){
+            if (i % columnCount == 0) {
                 canvas.drawLine(cellView.left.toFloat(), cellView.top.toFloat(),
                         cellView.left.toFloat(), cellView.bottom.toFloat(), localPaint)
             }
