@@ -30,7 +30,9 @@
         android:layout_marginEnd="8dp"
         android:layout_marginTop="8dp"
         android:text="0"
-        app:layout_constraintEnd_toEndOf="@+id/grid_swipe"
+        android:textSize="18sp"
+        app:layout_constraintEnd_toEndOf="@id/grid_swipe"
+        app:layout_constraintBaseline_toBaselineOf="@id/btn_start"
         app:layout_constraintTop_toTopOf="parent"/>
 
     <Button
