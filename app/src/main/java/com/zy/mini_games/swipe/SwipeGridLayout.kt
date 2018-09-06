@@ -39,12 +39,30 @@ class SwipeGridLayout @JvmOverloads constructor(
     }
 
     fun onChildClicked(v: SingleView, x: Int, y: Int) {
-//        showToast("xLength:$xLength,yLength:$yLength")
+        showToast("xLength:$xLength,yLength:$yLength")
         if (!started){
             initCurGame(x,y)
             started = true
         }
         //TODO 初始化完游戏之后 每一次（包括第一次）按下之后的逻辑
+        when(v.logicState){
+            SingleView.LOGICSTATE_BOMB -> {
+                v.viewState = SingleView.VIEWSTATE_BOMB
+                doEachSingle { singleView ->
+                    if (singleView.logicState == SingleView.LOGICSTATE_BOMB){
+                        loge("x:${singleView.x},y:${singleView.y}:bomb")
+                        singleView.viewState = SingleView.VIEWSTATE_THUNDER
+                    }
+                    singleView.enable = false
+                }
+            }
+            in 0..8 ->{
+                v.viewState = SingleView.VIEWSTATE_TIP
+            }
+        }
+
+        v.enable = false//点过一次之后不能再点击
+        doEachSingle { singleView ->  singleView.updateInsideImg() }
     }
 
     fun initCurGame(firstX:Int,firstY: Int){
@@ -55,7 +73,7 @@ class SwipeGridLayout @JvmOverloads constructor(
         for (i:Int in randomMines){
             val singleView = getChildByIndex(i)
             singleView.logicState = SingleView.LOGICSTATE_BOMB
-            singleView.viewState = SingleView.VIEWSTATE_THUNDER//test 显示雷
+            singleView.viewState = SingleView.VIEWSTATE_DEFAULT//test 显示雷
             singleView.updateInsideImg()
         }
         calMinesAround(randomMines)
@@ -79,10 +97,10 @@ class SwipeGridLayout @JvmOverloads constructor(
     }
 
     fun initAllChildBefore(){
-        for (i in 0..childCount-1){
-            val singleView = getChildByIndex(i)
+        doEachSingle {
+            singleView: SingleView ->
             singleView.logicState = 0
-            singleView.viewState = SingleView.VIEWSTATE_TIP//test 显示周围雷数量
+            singleView.viewState = SingleView.VIEWSTATE_DEFAULT//test 显示周围雷数量
             singleView.around = 0
             singleView.updateInsideImg()
         }
@@ -96,6 +114,11 @@ class SwipeGridLayout @JvmOverloads constructor(
         return getChildAt(y * columnCount + x) as SingleView
     }
 
+    fun doEachSingle(m:(singleView:SingleView)->Unit){
+        for (i in 0..childCount-1){
+            m(getChildByIndex(i))
+        }
+    }
 
     /**
      * 画分割线

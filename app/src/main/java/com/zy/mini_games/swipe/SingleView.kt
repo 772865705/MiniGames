@@ -35,7 +35,7 @@ class SingleView(context: Context?, attrs: AttributeSet?, defStyleAttr: Int)
                 field = value
         }
     var viewState = 0
-    var logicState = -1//-1 未初始化 0~8周围地雷数 -2雷 只有这几种可能
+    var logicState = LOGICSTATE_NOT_INITED//-1 未初始化 0~8周围地雷数 -2雷 只有这几种可能
     var enable = true//点击过以后不能再次点击 或者也有可能设置不可点击就行了？
     var x = -1
     var y = -1
@@ -106,7 +106,10 @@ class SingleView(context: Context?, attrs: AttributeSet?, defStyleAttr: Int)
     }
 
     fun reset() {
-
+        viewState = VIEWSTATE_DEFAULT
+        logicState = LOGICSTATE_NOT_INITED
+        around = 0
+        enable = true
     }
 }
 
