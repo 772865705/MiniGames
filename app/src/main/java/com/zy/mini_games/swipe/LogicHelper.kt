@@ -17,12 +17,13 @@ object LogicHelper {
 
         val randoms = arrayListOf(getIndexByXY(xlength, ylength, x, y))
 
-        while (randoms.size <= count + 1){
+        while (randoms.size < count + 1){
             val next = Random().nextInt(xlength * ylength)
             if (!randoms.contains(next)){
                 randoms.add(next)
             }
         }
+        randoms.remove(getIndexByXY(xlength, ylength, x, y))
         return randoms
     }
 
@@ -34,5 +35,22 @@ object LogicHelper {
         val x = index%ylength
         val y = index/ylength
         return intArrayOf(x,y)
+    }
+
+    /**
+     * 返回一个index的周围的index集合
+     */
+    fun getAroundItems(xlength:Int,ylength:Int,index:Int):ArrayList<Int>{
+        val list = ArrayList<Int>()
+        val x = index%ylength
+        val y = index/ylength
+        for (i in x-1..x+1){
+            for (j in y-1..y+1){
+                if (i >= 0 && i < xlength && j >= 0 && j < ylength && (i != x || j != y)){
+                    list.add(getIndexByXY(xlength, ylength, i, j))
+                }
+            }
+        }
+        return list
     }
 }

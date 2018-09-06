@@ -5,11 +5,9 @@ import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
 import android.util.AttributeSet
-import android.util.Log
 import android.widget.GridLayout
-import android.opengl.ETC1.getWidth
-import android.widget.Toast
-import com.zy.mini_games.R
+import com.zy.mini_games.utils.loge
+import com.zy.mini_games.utils.logi
 import com.zy.mini_games.utils.showToast
 
 
@@ -18,7 +16,7 @@ import com.zy.mini_games.utils.showToast
  */
 class SwipeGridLayout @JvmOverloads constructor(
         context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0,
-        var x: Int = 9, var y: Int = 9, var mineNum: Int = 10//默认9行9列10雷
+        var xLength: Int = 9, var yLength: Int = 9, var mineNum: Int = 10//默认9行9列10雷
 ) : GridLayout(context, attrs, defStyleAttr) {
 
 
@@ -29,10 +27,10 @@ class SwipeGridLayout @JvmOverloads constructor(
 
     fun fillAll() {
         removeAllViews()
-        rowCount = x
-        columnCount = y
-        for (j in 0 until x) {
-            for (i in 0 until y) {
+        rowCount = xLength
+        columnCount = yLength
+        for (j in 0 until xLength) {
+            for (i in 0 until yLength) {
                 val one = SingleView(context, i, j, this)
 //                Log.i(TAG, "fillAll: i:" + i)
                 addView(one, width / columnCount, height / rowCount)
@@ -41,22 +39,60 @@ class SwipeGridLayout @JvmOverloads constructor(
     }
 
     fun onChildClicked(v: SingleView, x: Int, y: Int) {
-        showToast("x:$x,y:$y")
+//        showToast("xLength:$xLength,yLength:$yLength")
         if (!started){
             initCurGame(x,y)
             started = true
         }
+        //TODO 初始化完游戏之后 每一次（包括第一次）按下之后的逻辑
     }
 
     fun initCurGame(firstX:Int,firstY: Int){
+        //初始化所有格子
+        initAllChildBefore()
+        //随机初始化雷 避免点下的第一个
+        val randomMines = LogicHelper.randomMines(xLength, yLength, firstX, firstY, mineNum)
+        for (i:Int in randomMines){
+            val singleView = getChildByIndex(i)
+            singleView.logicState = SingleView.LOGICSTATE_BOMB
+            singleView.viewState = SingleView.VIEWSTATE_THUNDER//test 显示雷
+            singleView.updateInsideImg()
+        }
+        calMinesAround(randomMines)
+    }
 
+    fun calMinesAround(randomMines: ArrayList<Int>) {
+        for (i:Int in randomMines){
+            for (j in LogicHelper.getAroundItems(xLength,yLength,i)){
+                logi("mine:$i,around:$j")
+                val view = getChildByIndex(j)
+                view.around++
+                view.updateInsideImg()
+            }
+        }
+
+
+    }
+
+    fun getChildByIndex(index:Int):SingleView{
+        return getChildAt(index) as SingleView
+    }
+
+    fun initAllChildBefore(){
+        for (i in 0..childCount-1){
+            val singleView = getChildByIndex(i)
+            singleView.logicState = 0
+            singleView.viewState = SingleView.VIEWSTATE_TIP//test 显示周围雷数量
+            singleView.around = 0
+            singleView.updateInsideImg()
+        }
     }
 
     fun onChildLongClicked(v: SingleView, x: Int, y: Int) {
-        showToast("long_x:$x,y:$y")
+        showToast("long_x:$x,yLength:$y")
     }
 
-    fun getChildByIndex(x: Int, y: Int): SingleView {
+    fun getChildByXY(x: Int, y: Int): SingleView {
         return getChildAt(y * columnCount + x) as SingleView
     }
 
