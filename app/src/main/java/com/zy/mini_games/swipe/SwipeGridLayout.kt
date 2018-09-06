@@ -47,7 +47,6 @@ class SwipeGridLayout @JvmOverloads constructor(
         //TODO 初始化完游戏之后 每一次（包括第一次）按下之后的逻辑
         when(v.logicState){
             SingleView.LOGICSTATE_BOMB -> {
-                v.viewState = SingleView.VIEWSTATE_BOMB
                 doEachSingle { singleView ->
                     if (singleView.logicState == SingleView.LOGICSTATE_BOMB){
                         loge("x:${singleView.x},y:${singleView.y}:bomb")
@@ -55,6 +54,7 @@ class SwipeGridLayout @JvmOverloads constructor(
                     }
                     singleView.enable = false
                 }
+                v.viewState = SingleView.VIEWSTATE_BOMB
             }
             in 0..8 ->{
                 v.viewState = SingleView.VIEWSTATE_TIP
@@ -106,7 +106,7 @@ class SwipeGridLayout @JvmOverloads constructor(
         }
     }
 
-    fun onChildLongClicked(v: SingleView, x: Int, y: Int) {
+    fun onChildLongClicked(v: SingleView, x: Int, y: Int,viewState:Int) {
         showToast("long_x:$x,yLength:$y")
     }
 

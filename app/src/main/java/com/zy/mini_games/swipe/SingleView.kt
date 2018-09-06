@@ -101,7 +101,15 @@ class SingleView(context: Context?, attrs: AttributeSet?, defStyleAttr: Int)
         if (!enable)
             return true
 
-        mGrid.onChildLongClicked(this,x,y)
+        viewState = when(viewState){
+            VIEWSTATE_DEFAULT -> VIEWSTATE_FLAG
+            VIEWSTATE_FLAG -> VIEWSTATE_UNSURE
+            VIEWSTATE_UNSURE -> VIEWSTATE_DEFAULT
+            else -> viewState
+        }
+        updateInsideImg()
+
+        mGrid.onChildLongClicked(this,x,y,viewState)
         return true
     }
 
