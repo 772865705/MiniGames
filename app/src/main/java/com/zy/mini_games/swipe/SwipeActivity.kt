@@ -25,7 +25,7 @@ class SwipeActivity : BaseActivity() {
         tv_rest.setText("剩余:${grid_swipe.mineNum} 颗雷")
         grid_swipe.listener = object :SwipeGridLayout.GameStateChange{
             override fun onStart(rest:Int) {
-                showToast("开始")
+//                showToast("开始")
                 tv_rest.setText("剩余:$rest 颗雷")
             }
 
@@ -34,13 +34,13 @@ class SwipeActivity : BaseActivity() {
             }
 
             override fun victory() {
-                showToast("胜利")
+//                showToast("胜利")
                 img_endgame.setImageResource(R.drawable.victory)
                 img_endgame.visibility = View.VISIBLE
             }
 
             override fun defeat() {
-                showToast("失败")
+//                showToast("失败")
                 img_endgame.setImageResource(R.drawable.defeat)
                 img_endgame.visibility = View.VISIBLE
             }
