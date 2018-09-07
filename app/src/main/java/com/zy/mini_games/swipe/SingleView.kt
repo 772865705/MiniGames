@@ -93,6 +93,8 @@ class SingleView(context: Context?, attrs: AttributeSet?, defStyleAttr: Int)
     override fun onClick(v: View?) {
         if (!enable)
             return
+        if (viewState == VIEWSTATE_FLAG)//fix 插旗以后应该不再能点开了，防误触
+            return
 
         mGrid.onChildClicked(this,x, y)
     }
