@@ -14,6 +14,6 @@ class MainActivity : BaseActivity() {
     }
 
     fun swipe(v:View){
-        startActivity(Intent(this,SwipeActivity().javaClass))
+        startActivity(Intent(this,SwipeActivity::class.java))
     }
 }
