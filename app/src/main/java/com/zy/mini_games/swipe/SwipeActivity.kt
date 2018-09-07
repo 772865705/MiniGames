@@ -29,6 +29,7 @@ class SwipeActivity : BaseActivity() {
             tv_time.setText("000")
             task?.cancel()
         }
+        img_endgame.setOnClickListener { img_endgame.visibility = View.GONE }
         tv_rest.setText(LogicHelper.int2String(grid_swipe.mineNum))
         val lcdFont = Typeface.createFromAsset(assets, "fonts/lcd2mono.ttf")
         tv_rest.setTypeface(lcdFont)
