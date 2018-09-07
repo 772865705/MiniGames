@@ -29,8 +29,9 @@
         android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"
         android:layout_marginTop="8dp"
-        android:text="0"
-        android:textSize="18sp"
+        android:text="000"
+        android:textColor="#EE0000"
+        android:textSize="28sp"
         app:layout_constraintEnd_toEndOf="@id/grid_swipe"
         app:layout_constraintBaseline_toBaselineOf="@id/btn_start"
         app:layout_constraintTop_toTopOf="parent"/>
@@ -39,9 +40,12 @@
         android:id="@+id/btn_start"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
-        android:text="开始"
+        android:background="#fff"
+        android:text="Start"
+        app:layout_constraintEnd_toEndOf="@+id/grid_swipe"
         app:layout_constraintStart_toStartOf="@+id/grid_swipe"
         app:layout_constraintTop_toTopOf="parent"/>
 
@@ -61,5 +65,17 @@
         app:layout_constraintStart_toStartOf="@+id/grid_swipe"
         app:layout_constraintTop_toTopOf="@+id/grid_swipe"
         app:srcCompat="@drawable/victory"/>
+
+    <TextView
+        android:id="@+id/tv_time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:text="000"
+        android:textColor="#EE0000"
+        android:textSize="28sp"
+        app:layout_constraintStart_toStartOf="@+id/grid_swipe"
+        app:layout_constraintBaseline_toBaselineOf="@id/btn_start"
+        tools:layout_editor_absoluteY="16dp"/>
 
 </android.support.constraint.ConstraintLayout>

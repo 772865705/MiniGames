@@ -53,4 +53,15 @@ object LogicHelper {
         }
         return list
     }
+
+    /**
+     * 转换成三位数文字
+     */
+    fun int2String(int:Int):String{
+        return when(int){
+            in 0..9 -> "00" + int.toString()
+            in 10..99 -> "0" + int.toString()
+            else -> int.toString()
+        }
+    }
 }

@@ -102,6 +102,8 @@ class SingleView(context: Context?, attrs: AttributeSet?, defStyleAttr: Int)
     override fun onLongClick(v: View?): Boolean {
         if (!enable)
             return true
+        if (!mGrid.started)
+            return true
 
         viewState = when(viewState){
             VIEWSTATE_DEFAULT -> VIEWSTATE_FLAG
